@@ -1,0 +1,169 @@
+  public void desbloquear(){
+    txtnomprod.setEnabled(true);
+    btncrear.setEnabled(true);
+    btnactualizar.setEnabled(true);
+    btneliminar.setEnabled(true);
+    btnaceptar.setEnabled(true);
+    btnsalir.setEnabled(true);
+    btnmostrar.setEnabled(true);
+    btnlimpiar.setEnabled(true);
+    }
+    
+     public void eliminar(){
+        int filInicio= tblproduc.getSelectedRow();
+        int numfila= tblproduc.getSelectedRowCount();
+        
+        ArrayList<String>listausuarios= new ArrayList<>();
+        String nomb=null;
+        
+        if(filInicio>=0){
+            for(int i=0; i<numfila; i++){
+                nomb= String.valueOf(tblproduc.getValueAt(i+filInicio,0));
+                listausuarios.add(i, nomb);
+            
+            }
+            
+             for (int j=0; j<numfila;j++){
+            int resp = JOptionPane.showConfirmDialog(null, "Esta seguro de eliminar el registro"+listausuarios.get(j)+"? ");
+            if(resp==0){
+                int filAfectada= 0;
+               
+                  try{
+                     Conexion basedatos= new Conexion();
+                     Connection conn;
+                     conn= basedatos.obtenerConexion();
+                     PreparedStatement ps= null;
+                     ResultSet consulta = null;
+                     
+                     ps= conn.prepareStatement("UPDATE productos SET estado= 0 WHERE nombres_producto="+nomb);
+                     
+                     int res= ps.executeUpdate();
+                     if(res>0){
+                         JOptionPane.showMessageDialog(null, "Los datos han sido Eliminados");
+                         mostrar();
+                     }else{
+                         JOptionPane.showMessageDialog(null, "Error al Eliminar los datos");
+                     }
+                }catch(Exception e){
+                    System.err.println(e);
+                }
+            }
+        }
+    }else{
+        JOptionPane.showMessageDialog(null, "Porfavor elija un registro para eliminar");
+    }
+}  
+    public void actualizar(){
+   String nomb,desc,ing,mar,fchin,st,cost;
+       
+        nomb= txtnomprod.getText();      
+        desc= txtdesc.getText();
+        ing=jDateChooser1.getDateFormatString();
+        mar= txtmarca.getText();
+        cost= txtcosto.getText();
+        fchin=jDateChooser2.getDateFormatString();
+        st=txtstock.getText();
+        if(nomb.equals("")|| desc.equals("")|| mar.equals("")|| cost.equals("")|| st.equals("")|| ing.equals("")
+                || fchin.equals("")){
+            JOptionPane.showMessageDialog(this,"Llene todos los campos de nuevo");
+       }
+       else{
+           cargar();
+
+               
+                  try{
+                     Conexion basedatos= new Conexion();
+                     Connection conn;
+                     conn= basedatos.obtenerConexion();
+                     PreparedStatement ps= null;
+                     ResultSet consulta = null;
+                     
+                     ps= conn.prepareStatement("UPDATE productos SET nombres_producto=?,costo_producto=?,"
+                        + "fecha_caducidad=?,marca=?,stock=?,descuento=?,fecha_ingreso=? WHERE nombres_producto="+nomb);
+                     
+                         
+                ps.setString(1, txtnomprod.getText ());
+                        
+                ps.setString(2, txtdesc.getText () );
+                        
+                ps.setString(3, txtmarca.getText ());
+                 
+                ps.setString(4, txtcosto.getText());
+                 
+                ps.setString(5, txtstock.getText());
+                 
+              
+                String Nacimiento= new SimpleDateFormat("yyyy-MM-dd").format (jDateChooser2.getDate());
+                ps.setString(6, Nacimiento);
+               
+                
+                String fecha= new SimpleDateFormat("yyyy-MM-dd").format (jDateChooser1.getDate());
+                ps.setString(7, fecha);
+               
+              
+                
+                ps.executeUpdate();
+                JOptionPane.showMessageDialog(this, "Actualizado Correctamente");
+                } catch (Exception e) {
+                       JOptionPane.showMessageDialog(this, "Error al Actualizar:" + e);
+                    }
+         mostrar();
+        }//Fin else
+}
+    public void cargar() {
+
+		if (tblproduc.getSelectedRowCount() > 0) {
+			txtnomprod.setText(tblproduc.getValueAt(tblproduc.getSelectedRow(), 0).toString());
+                        txtdesc.setText(tblproduc.getValueAt(tblproduc.getSelectedRow(),1).toString());
+                        txtmarca.setText(tblproduc.getValueAt(tblproduc.getSelectedRow(),2).toString());
+			txtcosto.setText(tblproduc.getValueAt(tblproduc.getSelectedRow(), 3).toString());
+			txtstock.setText(tblproduc.getValueAt(tblproduc.getSelectedRow(), 4).toString());
+                        
+		}
+	}                   
+        
+    public void Editar(){
+        
+       int filInicio = tblproduc.getSelectedRow();
+        int numfilas = tblproduc.getSelectedRowCount();
+        ArrayList<String> listaCod = new ArrayList<>();
+        String codigo = null;
+        if(filInicio>=0){
+             for(int i = 0; i<numfilas; i++)
+              {
+                    codigo = String.valueOf(tblproduc.getValueAt(i+filInicio, 0));
+                    listaCod.add(i, codigo);
+                   
+              }
+                for(int j = 0; j<numfilas; j++){
+                    int rpta = JOptionPane.showConfirmDialog(null, "Desea Actualizar registro con codigo: "+listaCod.get(j)+"? ");
+              
+                        if(rpta==0){
+                    //jDateChooser1.setEnabled(false);
+                     txtnomprod.setText(listaCod.get(j));             
+    
+                    //btnnuevo.setEnabled(false);
+                btnmostrar.setEnabled(false);
+                btnactualizar.setEnabled(false);
+                btneliminar.setEnabled(false);
+                btnlimpiar.setEnabled(false);
+                btnsalir.setEnabled(false);
+                btncrear.setEnabled(false);
+                btnaceptar.setEnabled(true);
+                }
+                  if(rpta==1){
+ 
+                        txtnomprod.setText(""); 
+                       desbloquear(); 
+                 }
+                  if(rpta==2){   
+    
+                        txtnomprod.setText(""); 
+                              desbloquear();    
+                }
+            }
+             mostrar();
+                }else{
+                JOptionPane.showMessageDialog(null, "Elija al menos un registro para actualizar.");
+            }
+        }
